@@ -18,9 +18,12 @@ from app.api.api_user_role.user_role_controller import user_role_controller
 from app.mongo.mongo_connection import mongodb
 from app.postgres.postgres_connection import pgConn
 from app.redis.redis_connection import redisConnection
+from app.worker.worker import AppWorker
+import app.socket.socket_events  # register socket handlers
 from app.core.logger import ColorFormatter
 
 logger = logging.getLogger(__name__)
+app_worker = AppWorker()
 
 
 @asynccontextmanager
@@ -33,6 +36,7 @@ async def lifespan(_: FastAPI):
             redisConnection.connect(),
         )
         logger.debug("Successfully connected to PostgreSQL, MongoDB, and Redis.")
+        await app_worker.start()
     except Exception as exc:
         logger.error(
             f"Application startup failed: {type(exc).__module__}.{type(exc).__name__}: {str(exc)}"
@@ -41,6 +45,8 @@ async def lifespan(_: FastAPI):
         raise RuntimeError(str(exc)) from None
 
     yield
+
+    await app_worker.stop()
 
     await asyncio.gather(
         mongodb.close(),
@@ -56,12 +62,12 @@ app.add_middleware(AppMiddleware)
 # CORSMiddleware cần khai báo cuối cùng, để cho client đọc response, bất kể statusCode là gì
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5174",
-        "http://127.0.0.1:5174",
-        "http://192.168.1.21:5174",
-    ],
-    # allow_origins=["*"],
+    # allow_origins=[
+    #     "http://localhost:5174",
+    #     "http://127.0.0.1:5174",
+    #     "http://192.168.1.21:5174",
+    # ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

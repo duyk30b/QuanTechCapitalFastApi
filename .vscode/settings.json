@@ -30,5 +30,6 @@
     "reportUnknownVariableType": "warning",
     "reportUnknownArgumentType": "warning",
     "reportPrivateUsage": "warning"
-  }
+  },
+  "cSpell.words": ["metatrader"]
 }

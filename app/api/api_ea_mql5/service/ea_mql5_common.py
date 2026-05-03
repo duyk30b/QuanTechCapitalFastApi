@@ -40,5 +40,7 @@ class EaMql5Common:
         eaMql5FolderPath = os.path.join(
             mql5FolderPath, "Experts", "PYTHON_SERVER", ea_mql5_id
         )
+        eaMql5ReportFolderPath = os.path.join(eaMql5FolderPath, "Report")
         os.makedirs(eaMql5FolderPath, exist_ok=True)
+        os.makedirs(eaMql5ReportFolderPath, exist_ok=True)
         return eaMql5FolderPath

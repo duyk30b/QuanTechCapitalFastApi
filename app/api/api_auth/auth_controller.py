@@ -23,9 +23,6 @@ async def login(
     state: RequestState = Depends(RequestDepends.state),
     db: Session = Depends(pgConn.get_db),
 ) -> dict[str, Any]:
-    raise RuntimeError(
-        "Login is disabled for security reasons. Please contact the administrator."
-    )
     data = await auth_service.login(state, body, db)
     return data
 
