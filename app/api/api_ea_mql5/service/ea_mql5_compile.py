@@ -1,8 +1,9 @@
-from typing import Any
+from typing import Any, cast
 
 from fastapi import HTTPException
-from app.api.api_ea_mql5.service.ea_mql5_common import EaMql5Common
+from app.api.service_common.service_common import ServiceCommon
 from app.mongo.models.ea_mql5_model import EaMql5Model, EaMql5Status
+from app.mongo.models.setting_model import SettingKey
 from app.mongo.repositories.ea_mql5_repository import ea_mql5_repository
 import subprocess
 import os
@@ -14,15 +15,16 @@ class EaMql5Compile:
         pass
 
     async def start_compile(self, ea_mql5_id: str) -> dict[str, Any]:
-        mqlFolderPath = await EaMql5Common.get_mql5_folder_path()
-        mt5Path = await EaMql5Common.get_mt5_folder_path()
+        settingDict = await ServiceCommon.get_setting_dict()
+        mqlFolderPath = cast(str, settingDict.get(SettingKey.MQL5_FOLDER_PATH))
+        mt5FolderPath = cast(str, settingDict.get(SettingKey.MT5_FOLDER_PATH))
 
         eaMql5 = await ea_mql5_repository.find_one_by_id(ea_mql5_id)
         if not eaMql5:
             raise HTTPException(status_code=404, detail="EA MQL5 not found")
         mql5Code = eaMql5.mql5Code
 
-        eaMql5FolderPath = EaMql5Common.get_ea_mql5_folder_path(
+        eaMql5FolderPath = ServiceCommon.get_ea_mql5_folder_path(
             mqlFolderPath, ea_mql5_id
         )
 
@@ -30,7 +32,7 @@ class EaMql5Compile:
         with open(mq5FilePath, "w", encoding="utf-8") as f:
             f.write(mql5Code)
 
-        metaEditorPath = os.path.join(mt5Path, "MetaEditor64.exe")
+        metaEditorPath = os.path.join(mt5FolderPath, "MetaEditor64.exe")
         logCompileFilePath = os.path.join(eaMql5FolderPath, f"{eaMql5.id}_compile.log")
 
         command = [

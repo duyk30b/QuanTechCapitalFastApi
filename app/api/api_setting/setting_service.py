@@ -11,7 +11,7 @@ class SettingService:
         pass
 
     async def setting_list(self) -> dict[str, Any]:
-        result = await setting_repository.list()
+        result = await setting_repository.find_many()
         return {"settingList": [setting.to_response() for setting in result]}
 
     async def setting_upsert(

@@ -90,7 +90,7 @@ class MongoRepository(Generic[M, C, U, F, S], MongoCondition):
             limit=limit,
         )
 
-    async def list(
+    async def find_many(
         self, filter: Optional[F] = None, limit: int | None = None
     ) -> List[M]:
         mongo_filter = self._to_filter(filter)

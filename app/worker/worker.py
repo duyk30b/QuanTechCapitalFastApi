@@ -1,7 +1,6 @@
 import logging
 
-from app.worker import mt5_status_job
-from app.worker.mt5_status_job import Mt5StatusJob
+from app.worker.mt5_status_job.mt5_status_job import Mt5StatusJob
 
 logger = logging.getLogger(__name__)
 

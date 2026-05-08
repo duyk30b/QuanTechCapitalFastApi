@@ -1,4 +1,3 @@
-from math import e
 from typing import Any
 
 from fastapi import APIRouter, Depends
@@ -77,5 +76,5 @@ async def ea_mql5_start_run_test(
 
 @ea_mql5_controller.post("/stop-run-test/{ea_mql5_id}")
 async def ea_mql5_stop_run_test(ea_mql5_id: str) -> dict[str, Any]:
-    data = await ea_mql5_service.ea_mql5_stop_run_test(ea_mql5_id=ea_mql5_id)
+    data = await ea_mql5_run_test.ea_mql5_stop_run_test(ea_mql5_id=ea_mql5_id)
     return data

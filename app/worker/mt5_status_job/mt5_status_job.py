@@ -1,6 +1,7 @@
 import asyncio
 
-from app.module.mt5_module import mt5_module
+from app.worker.mt5_status_job.mt5_run_queue import mt5_run_queue
+from app.worker.mt5_status_job.mt5_process_information import mt5_process_information
 from app.socket.handlers.mt5_handler import SocketMt5Handler
 
 
@@ -11,8 +12,17 @@ class Mt5StatusJob:
 
     async def _run(self):
         while True:
-            process_status = mt5_module.get_proc_status()
-            await SocketMt5Handler.emit_mt5_status(data=process_status)
+            process_status = mt5_process_information.get_proc_status()
+            queue_waiting_count = mt5_run_queue.get_queue_size()
+            await SocketMt5Handler.emit_mt5_status(
+                data={
+                    "name": process_status["name"],
+                    "pid": process_status["pid"],
+                    "cpu_percent": process_status["cpu_percent"],
+                    "memory_mb": process_status["memory_mb"],
+                    "queue_waiting_count": queue_waiting_count,
+                },
+            )
             await asyncio.sleep(self._interval_seconds)
 
     async def start(self):

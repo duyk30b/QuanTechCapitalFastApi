@@ -20,7 +20,7 @@ class EaMql5Status(IntEnum):
     Finished = 3
 
 
-class EaConfigIni(TypedDict, total=False):
+class EaConfigIni(TypedDict, total=True):
     symbol: str
     period: str
     fromDate: int

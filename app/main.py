@@ -55,12 +55,12 @@ async def lifespan(_: FastAPI):
     pgConn.close()
 
 
-app = FastAPI(lifespan=lifespan)
+fast_app = FastAPI(lifespan=lifespan)
 
 
-app.add_middleware(AppMiddleware)
+fast_app.add_middleware(AppMiddleware)
 # CORSMiddleware cần khai báo cuối cùng, để cho client đọc response, bất kể statusCode là gì
-app.add_middleware(
+fast_app.add_middleware(
     CORSMiddleware,
     # allow_origins=[
     #     "http://localhost:5174",
@@ -73,20 +73,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(setting_controller)
-app.include_router(auth_controller)
-app.include_router(me_controller)
-app.include_router(user_controller)
-app.include_router(role_controller)
-app.include_router(user_role_controller)
-app.include_router(ea_mql5_controller)
+fast_app.include_router(setting_controller)
+fast_app.include_router(auth_controller)
+fast_app.include_router(me_controller)
+fast_app.include_router(user_controller)
+fast_app.include_router(role_controller)
+fast_app.include_router(user_role_controller)
+fast_app.include_router(ea_mql5_controller)
 
-app.add_exception_handler(RequestValidationError, AppExceptionHandler.build_response)
+fast_app.add_exception_handler(
+    RequestValidationError, AppExceptionHandler.build_response
+)
 
 
-@app.get("/")
+@fast_app.get("/")
 async def root():
     return {"message": "Hello World"}
 
 
-socket_app = socketio.ASGIApp(sio, other_asgi_app=app)
+socket_app = socketio.ASGIApp(sio, other_asgi_app=fast_app)

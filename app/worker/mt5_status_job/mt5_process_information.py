@@ -1,7 +1,3 @@
-from __future__ import annotations
-
-from multiprocessing import process
-from os import name
 import subprocess
 from pathlib import Path
 from typing import Any, List, Optional, Set, TypedDict, cast
@@ -16,7 +12,7 @@ class Mt5ProcessStatus(TypedDict):
     memory_mb: float
 
 
-class Mt5Module:
+class Mt5ProcessInformation:
     PROCESS_NAMES: Set[str] = {
         "terminal64.exe",
         "terminal.exe",
@@ -144,4 +140,4 @@ class Mt5Module:
             }
 
 
-mt5_module = Mt5Module()
+mt5_process_information = Mt5ProcessInformation()

@@ -4,6 +4,7 @@ from typing import Any, List, Optional, Type
 from pymongo import AsyncMongoClient
 from pymongo.asynchronous.database import AsyncDatabase
 
+from app.mongo.models.setting_model import SettingModel
 from app.mongo.mongo_model import MongoModel
 from app.mongo.models.ea_mql5_model import (
     EaMql5Model,
@@ -19,6 +20,7 @@ class MongoDB:
 
         self.collections: List[Type[MongoModel]] = [
             EaMql5Model,
+            SettingModel,
         ]
 
     async def connect(self) -> None:
