@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from typing import Any
 
 from fastapi import HTTPException
@@ -38,6 +39,7 @@ class AuthService:
         token_payload: TokenPayload = {
             "userId": user.id,
             "clientId": clientId,
+            "loginTime": datetime.now().timestamp(),
         }
 
         try:
@@ -46,7 +48,7 @@ class AuthService:
         except ValueError as exc:
             raise HTTPException(status_code=401, detail=str(exc)) from exc
 
-        await userLoginCache.login(user.id, clientId)
+        await userLoginCache.login(user.id, clientId, token_payload["loginTime"])
 
         return {
             "user": {
@@ -80,12 +82,13 @@ class AuthService:
         token_payload: TokenPayload = {
             "userId": user.id,
             "clientId": clientId,
+            "loginTime": datetime.now().timestamp(),
         }
 
         accessToken = TokenModule.create_access_token(token_payload)
         refreshToken = TokenModule.create_refresh_token(token_payload)
 
-        await userLoginCache.login(user.id, clientId)
+        await userLoginCache.login(user.id, clientId, token_payload["loginTime"])
         return {
             "user": {
                 "id": user.id,
@@ -110,7 +113,9 @@ class AuthService:
         if userId == 0:
             raise HTTPException(status_code=401, detail="Invalid token")
 
-        if not await userLoginCache.check_client(userId, clientId):
+        if not await userLoginCache.check_client(
+            userId, clientId, decoded_token["data"]["loginTime"]
+        ):
             raise HTTPException(
                 status_code=401, detail="Refresh token has been revoked"
             )
@@ -125,6 +130,7 @@ class AuthService:
         token_payload: TokenPayload = {
             "userId": user.id,
             "clientId": clientId,
+            "loginTime": decoded_token["data"]["loginTime"],
         }
 
         try:
@@ -144,10 +150,11 @@ class AuthService:
         self,
         body: LogoutBody,
     ):
-        payload = TokenModule.decode_access_token(body.refreshToken)
+        payload = TokenModule.decode_refresh_token(body.refreshToken)
         userId: int = payload["data"]["userId"]
         clientId: str = payload["data"].get("clientId", "").strip()
+        loginTime: float = payload["data"].get("loginTime", 0.0)
 
-        await userLoginCache.logout(userId, clientId)
+        await userLoginCache.logout(userId, clientId, loginTime)
 
         return {"message": "Logout successful"}

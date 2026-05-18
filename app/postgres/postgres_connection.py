@@ -1,9 +1,12 @@
 from collections.abc import Generator
+import logging
 
 from sqlalchemy import Engine, create_engine, text
 from sqlalchemy.orm import Session, sessionmaker
 
 from .postgres_config import postgres_settings
+
+logger = logging.getLogger(__name__)
 
 
 class PostgresConnection:
@@ -23,9 +26,17 @@ class PostgresConnection:
             # Force an immediate DB round-trip so startup fails fast on bad config.
             with self.engine.connect() as conn:
                 conn.execute(text("SELECT 1"))
+            logger.debug(
+                f"Successfully connected to PostgreSQL: {postgres_settings.sqlalchemy_database_uri}"
+            )
         except Exception as exc:
             self.close()
-            raise RuntimeError(f"Failed to connect PostgreSQL: {exc}")
+            logger.error(
+                f"Failed to connect PostgreSQL: {postgres_settings.sqlalchemy_database_uri}: {exc}"
+            )
+            raise RuntimeError(
+                f"Failed to connect PostgreSQL: {postgres_settings.sqlalchemy_database_uri}: {exc}"
+            )
 
     def close(self) -> None:
         if self.engine is not None:

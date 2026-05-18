@@ -6,15 +6,12 @@ from sqlalchemy import pool
 from alembic import context
 
 from app.postgres.postgres_config import postgres_settings
-from app.postgres.base_entity import BaseEntity
+from app.postgres.postgres_entity import PostgresEntity
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-config.set_main_option(
-    "sqlalchemy.url",
-    postgres_settings.sqlalchemy_database_uri
-)
+config.set_main_option("sqlalchemy.url", postgres_settings.sqlalchemy_database_uri)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -25,13 +22,14 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = BaseEntity.metadata
+target_metadata = PostgresEntity.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 from app.postgres.entities.user_entity import UserEntity  # noqa
+
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -71,9 +69,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

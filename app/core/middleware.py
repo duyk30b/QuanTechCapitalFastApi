@@ -49,6 +49,7 @@ class AppMiddleware(BaseHTTPMiddleware):
                     payload = TokenModule.decode_access_token(accessToken)
                     userId: int = payload["data"]["userId"]
                     tokenClientId = payload["data"].get("clientId", "").strip()
+                    tokenLoginTime = payload["data"].get("loginTime", 0.0)
                     request.state.userId = userId
 
                     if clientId != tokenClientId:
@@ -56,7 +57,9 @@ class AppMiddleware(BaseHTTPMiddleware):
                             "Token invalid: ClientID does not match token."
                         )
 
-                    if not await userLoginCache.check_client(userId, clientId):
+                    if not await userLoginCache.check_client(
+                        userId, clientId, tokenLoginTime
+                    ):
                         raise AuthenticationException("Token invalid: Token revoked.")
 
                     userCache = await userDataCache.get_user(userId)

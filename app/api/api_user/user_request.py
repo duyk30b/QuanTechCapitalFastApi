@@ -6,7 +6,7 @@ from app.postgres.entities.user_entity import UserType
 class UserInfo(BaseModel):
     fullName: str = Field(..., min_length=3)
     isActive: int = Field(...)
-    userType: int = Field(default=UserType.USER)
+    userType: UserType = Field(default=UserType.USER)
 
 
 class AccountInfo(BaseModel):

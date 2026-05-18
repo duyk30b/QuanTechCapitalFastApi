@@ -18,6 +18,7 @@ class TokenResponse(TypedDict):
 class TokenPayload(TypedDict):
     userId: int
     clientId: str
+    loginTime: float  # timestamp in seconds
 
 
 class TokenDecoded(TypedDict):

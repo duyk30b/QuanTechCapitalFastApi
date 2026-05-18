@@ -12,6 +12,7 @@ from app.mongo.models.ea_mql5_model import (
 from app.mongo.mongo_config import mongo_settings
 
 logging.getLogger("pymongo").setLevel(logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class MongoDB:
@@ -30,9 +31,17 @@ class MongoDB:
         )
         try:
             await self.client.admin.command("ping")
+            logger.debug(
+                f"Successfully connected to MongoDB: {mongo_settings.mongo_uri}"
+            )
         except Exception as exc:
             await self.close()
-            raise RuntimeError(f"Failed to connect MongoDB: {exc}")
+            logger.error(
+                f"Failed to connect MongoDB: {mongo_settings.mongo_uri}: {exc}"
+            )
+            raise RuntimeError(
+                f"Failed to connect MongoDB: {mongo_settings.mongo_uri}: {exc}"
+            )
 
     async def close(self) -> None:
         if self.client:

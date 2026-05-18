@@ -59,7 +59,9 @@ class AppExceptionHandler:
         query = request.url.query if hasattr(request, "url") else ""
 
         error = getattr(exc, "error", "SERVER_ERROR")
-        status_code = getattr(exc, "status_code", 500)
+        status_code = getattr(exc, "status_code", None)
+        if not isinstance(status_code, int):
+            status_code = 500
         message = getattr(exc, "message", str(exc))
         module = f"{type(exc).__module__}.{type(exc).__name__}"
         details = getattr(exc, "details", None)

@@ -70,7 +70,7 @@ async def ea_mql5_compile_and_save(ea_mql5_id: str) -> dict[str, Any]:
 async def ea_mql5_start_run_test(
     ea_mql5_id: str, body: EaMql5RunTestBody
 ) -> dict[str, Any]:
-    data = await ea_mql5_run_test.start_run_test(ea_mql5_id=ea_mql5_id, body=body)
+    data = await ea_mql5_run_test.start_run_test_old(ea_mql5_id=ea_mql5_id, body=body)
     return data
 
 

@@ -12,7 +12,7 @@ from app.api.api_auth.auth_controller import auth_controller
 from app.api.api_ea_mql5.ea_mql5_controller import ea_mql5_controller
 from app.api.api_me.me_controller import me_controller
 from app.api.api_setting.setting_controller import setting_controller
-from app.api.api_user.api_user_controller import user_controller
+from app.api.api_user.user_controller import user_controller
 from app.api.api_role.role_controller import role_controller
 from app.api.api_user_role.user_role_controller import user_role_controller
 from app.mongo.mongo_connection import mongodb
@@ -29,13 +29,11 @@ app_worker = AppWorker()
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     try:
-        logger.debug("Connecting PostgreSQL, MongoDB, and Redis...")
         await asyncio.gather(
             pgConn.connect(),
             mongodb.connect(),
             redisConnection.connect(),
         )
-        logger.debug("Successfully connected to PostgreSQL, MongoDB, and Redis.")
         await app_worker.start()
     except Exception as exc:
         logger.error(
